@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getFilmBySearch(@RequestParam @NotNull String text) {
+    public List<ItemDto> getFilmBySearch(@RequestParam String text) {
         log.info("GET / search / {}", text);
         return itemService.getItemBySearch(text);
     }
