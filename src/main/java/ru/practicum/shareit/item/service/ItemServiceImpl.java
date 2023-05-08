@@ -2,7 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -23,7 +23,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemById(long itemId) {
         Item item = itemRepository.getItemById(itemId).orElseThrow(() ->
-                new ItemNotFoundException("Вещь не найдена."));
+                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
         return ItemMapper.toItemDto(item);
     }
 
@@ -35,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getItemBySearch(String text) {
-        if (text == null || text.isEmpty() || text.isBlank()) {
+        if (text.isBlank()) {
             return Collections.emptyList();
         }
         return itemRepository.getItemBySearch(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
@@ -51,7 +51,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(long itemId, ItemDto itemDto, long userId) {
         userService.getUserById(userId);
         Item item = itemRepository.getItemById(itemId).orElseThrow(() ->
-                new ItemNotFoundException("Вещь не найдена."));
+                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean available = itemDto.getAvailable();
@@ -66,7 +66,8 @@ public class ItemServiceImpl implements ItemService {
                 item.setAvailable(available);
             }
         } else {
-            throw new NotOwnerException(String.format("Пользователь с id %s не является собственником %s", userId, name));
+            throw new NotOwnerException(String.format("Пользователь с id %s не является собственником %s",
+                    userId, name));
         }
         return ItemMapper.toItemDto(item);
     }
