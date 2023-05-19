@@ -16,12 +16,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.getAllUsers().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
     @Override
     public UserDto getUserById(long userId) {
-        User user = userRepository.getUserById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", User.class)));
         return UserMapper.toUserDto(user);
     }
@@ -29,13 +29,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto saveNewUser(UserDto userDto) {
         validateUniqueEmail(userDto);
-        User user = userRepository.saveNewUser(UserMapper.toUser(userDto));
+        User user = userRepository.save(UserMapper.toUser(userDto));
         return UserMapper.toUserDto(user);
     }
 
     @Override
     public UserDto updateUser(long userId, UserDto userDto) {
-        User user = userRepository.getUserById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", User.class)));
         String name = userDto.getName();
         String email = userDto.getEmail();
@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(long id) {
-        userRepository.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
     private void validateUniqueEmail(UserDto userDto) {
-        if (userRepository.getAllUsers().stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
+        if (userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(userDto.getEmail()))) {
             throw new NotUniqueEmailException(String.format("Email %s уже используется.", userDto.getEmail()));
         }
     }

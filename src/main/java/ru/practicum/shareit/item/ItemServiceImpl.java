@@ -18,7 +18,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItemById(long itemId) {
-        Item item = itemRepository.getItemById(itemId).orElseThrow(() ->
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
         return ItemMapper.toItemDto(item);
     }
@@ -26,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemsByOwner(long userId) {
         userService.getUserById(userId);
-        return itemRepository.getItemsByOwner(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.findAllByOwnerId(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
@@ -34,19 +34,21 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.getItemBySearch(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.search(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     @Override
     public ItemDto saveNewItem(ItemDto itemDto, long userId) {
         userService.getUserById(userId);
-        return ItemMapper.toItemDto(itemRepository.saveNewItem(ItemMapper.toItem(itemDto), userId));
+        Item item = ItemMapper.toItem(itemDto);
+        item.setOwnerId(userId);
+        return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
     @Override
     public ItemDto updateItem(long itemId, ItemDto itemDto, long userId) {
         userService.getUserById(userId);
-        Item item = itemRepository.getItemById(itemId).orElseThrow(() ->
+        Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
         String name = itemDto.getName();
         String description = itemDto.getDescription();
