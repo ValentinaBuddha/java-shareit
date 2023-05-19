@@ -1,8 +1,9 @@
-package ru.practicum.shareit.user.repository;
+package ru.practicum.shareit.user;
 
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.UserRepository;
 
 import java.util.*;
 
