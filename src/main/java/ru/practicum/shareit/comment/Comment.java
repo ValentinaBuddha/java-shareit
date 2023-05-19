@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,21 +8,23 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "comments")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column
-    private String name;
+    private String text;
 
-    @Column
-    private String email;
+    @Column(name = "item_id")
+    private long itemId;
+
+    @Column(name = "author_id")
+    private long authorId;
 }
-
