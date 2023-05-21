@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping
     public UserDto saveNewUser(@Validated(Create.class) @RequestBody UserDto userDto) {
-        log.info("POST / users / {}", userDto.getName());
+        log.info("POST / users / {} / {}", userDto.getName(), userDto.getEmail());
         return userService.saveNewUser(userDto);
     }
 
