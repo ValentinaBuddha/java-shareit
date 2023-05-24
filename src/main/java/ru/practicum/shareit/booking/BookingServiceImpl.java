@@ -28,7 +28,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDtoOut saveNewBooking(BookingDtoIn bookingDtoIn, long userId) {
         User booker = UserMapper.toUser(userService.getUserById(userId));
-        Item item = ItemMapper.toItem(itemService.getItemById(bookingDtoIn.getItemId()));
+        Item item = ItemMapper.toItem(itemService.getItemById(bookingDtoIn.getItemId(), userId));
         if (!item.getAvailable()) {
             throw new ItemIsNotAvailableException("Вещь недоступна для брони");
         }
@@ -51,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDtoOut approve(long bookingId, Boolean isApproved, long userId) {
         User owner = UserMapper.toUser(userService.getUserById(userId));
         Booking booking = getById(bookingId);
-        Item item = ItemMapper.toItem(itemService.getItemById(booking.getItem().getId()));
+        Item item = ItemMapper.toItem(itemService.getItemById(booking.getItem().getId(), userId));
         if (booking.getStatus() != BookingStatus.WAITING) {
             throw new ItemIsNotAvailableException("Вещь уже забронирована");
         }
@@ -73,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
         User booker = booking.getBooker();
         User owner = UserMapper.toUser(userService.getUserById(booking.getItem().getOwner().getId()));
         if (booker.getId() != userId && owner.getId() != userId) {
-            throw new IllegalVewAndUpdateException("Только автор или владелец вещи может просматривать данное броинрование");
+            throw new IllegalVewAndUpdateException("Только автор или владелец может просматривать данное броинрование");
         }
         return BookingMapper.toBookingDtoOut(booking);
     }
@@ -87,11 +87,11 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 bookings = bookingRepository.findAllByBookerIdOrderByStartDesc(booker.getId());
                 break;
-            case "PAST":
-                bookings = bookingRepository.findAllByBookerIdAndStatePastOrderByStartDesc(booker.getId());
-                break;
             case "CURRENT":
                 bookings = bookingRepository.findAllByBookerIdAndStateCurrentOrderByStartDesc(booker.getId());
+                break;
+            case "PAST":
+                bookings = bookingRepository.findAllByBookerIdAndStatePastOrderByStartDesc(booker.getId());
                 break;
             case "FUTURE":
                 bookings = bookingRepository.findAllByBookerIdAndStateFutureOrderByStartDesc(booker.getId());
@@ -119,11 +119,11 @@ public class BookingServiceImpl implements BookingService {
             case "ALL":
                 bookings = bookingRepository.findAllByOwnerIdOrderByStartDesc(owner.getId());
                 break;
-            case "PAST":
-                bookings = bookingRepository.findAllByOwnerIdAndStatePastOrderByStartDesc(owner.getId());
-                break;
             case "CURRENT":
                 bookings = bookingRepository.findAllByOwnerIdAndStateCurrentOrderByStartDesc(owner.getId());
+                break;
+            case "PAST":
+                bookings = bookingRepository.findAllByOwnerIdAndStatePastOrderByStartDesc(owner.getId());
                 break;
             case "FUTURE":
                 bookings = bookingRepository.findAllByOwnerIdAndStateFutureOrderByStartDesc(owner.getId());
@@ -148,6 +148,4 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findById(bookingId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Booking.class)));
     }
-
-
 }

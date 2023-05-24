@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.*;
-import ru.practicum.shareit.comment.*;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotOwnerException;
+import ru.practicum.shareit.exception.NotBookerException;
+import ru.practicum.shareit.item.comment.*;
 import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.User;
+
 import java.time.LocalDateTime;
 
 import java.util.Collections;
@@ -90,11 +92,12 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.search(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
-    private CommentDtoOut addComment(long userId, long itemId, CommentDtoIn commentDtoIn) {
+    @Override
+    public CommentDtoOut saveNewComment(long itemId, CommentDtoIn commentDtoIn, long userId) {
         User user = UserMapper.toUser(userService.getUserById(userId));
         Item item = ItemMapper.toItem(getItemById(itemId, userId));
         if (!bookingRepository.existsByBookerIdAndItemIdAndEndBefore(user.getId(), item.getId(), LocalDateTime.now())) {
-            throw new EntityNotFoundException("Пользователь не пользовался вещью");
+            throw new NotBookerException("Пользователь не пользовался вещью");
         }
         Comment comment = commentRepository.save(CommentMapper.toComment(commentDtoIn, item, user));
         return CommentMapper.toCommentDtoOut(comment);

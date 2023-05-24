@@ -1,4 +1,4 @@
-package ru.practicum.shareit.comment;
+package ru.practicum.shareit.item.comment;
 
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
@@ -6,7 +6,7 @@ import ru.practicum.shareit.user.User;
 import java.time.LocalDateTime;
 
 public class CommentMapper {
-    public static CommentDtoOut toCommentDtoOut (Comment comment) {
+    public static CommentDtoOut toCommentDtoOut(Comment comment) {
         return new CommentDtoOut(comment.getId(),
                 comment.getText(),
                 comment.getAuthor().getName(),

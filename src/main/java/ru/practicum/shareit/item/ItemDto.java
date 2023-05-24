@@ -3,9 +3,8 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.booking.BookingDtoOut;
 import ru.practicum.shareit.booking.BookingDtoShort;
-import ru.practicum.shareit.comment.CommentDtoOut;
+import ru.practicum.shareit.item.comment.CommentDtoOut;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.utils.Create;
 

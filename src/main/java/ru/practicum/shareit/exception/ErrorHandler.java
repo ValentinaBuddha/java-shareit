@@ -15,7 +15,8 @@ import javax.validation.ConstraintViolationException;
 public class ErrorHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ItemIsNotAvailableException.class,
-    WrongDatesException.class, BookingCanBeApprovedOnlyByOwnerException.class, UnsupportedStatusException.class})
+            WrongDatesException.class, BookingCanBeApprovedOnlyByOwnerException.class,
+            UnsupportedStatusException.class, NotBookerException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validateException(RuntimeException e) {
         log.info(e.getMessage());

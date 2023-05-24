@@ -1,9 +1,7 @@
 package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import ru.practicum.shareit.utils.Create;
 import ru.practicum.shareit.utils.Update;
 

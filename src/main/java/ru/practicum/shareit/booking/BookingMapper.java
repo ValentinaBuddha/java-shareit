@@ -15,22 +15,20 @@ public class BookingMapper {
         );
     }
 
-//    public Booking toBooking(BookingDtoIn bookingDtoIn) {
-//        return new Booking(
-//                bookingDtoIn.getId(),
-//                bookingDtoIn.getStart(),
-//                bookingDtoIn.getEnd(),
-//                bookingDtoIn.getItemId(),
-//                bookingDtoIn.getBooker(),
-//                bookingDtoIn.getStatus()
-//        );
-//    }
+    public BookingDtoShort toBookingDtoShort(Booking booking) {
+        return new BookingDtoShort(
+                booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                booking.getStatus(),
+                booking.getBooker().getId()
+        );
+    }
 
     public static Booking toBooking(BookingDtoIn bookingDtoIn, Booking booking) {
         booking.setStart(bookingDtoIn.getStart());
         booking.setEnd(bookingDtoIn.getEnd());
         booking.setStatus(BookingStatus.WAITING);
-
         return booking;
     }
 }
