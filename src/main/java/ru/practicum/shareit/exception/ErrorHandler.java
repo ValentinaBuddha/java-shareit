@@ -14,9 +14,10 @@ import javax.validation.ConstraintViolationException;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({MethodArgumentNotValidException.class, ItemIsNotAvailableException.class,
+    WrongDatesException.class, BookingCanBeApprovedOnlyByOwnerException.class, UnsupportedStatusException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validateException(final MethodArgumentNotValidException e) {
+    public ErrorResponse validateException(RuntimeException e) {
         log.info(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
@@ -27,9 +28,10 @@ public class ErrorHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({EntityNotFoundException.class, IllegalVewAndUpdateException.class,
+            NotAvailableToBookOwnItemsException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse entityNotFoundException(final EntityNotFoundException e) {
+    public ErrorResponse entityNotFoundException(RuntimeException e) {
         log.info(e.getMessage());
         return new ErrorResponse(e.getMessage());
     }

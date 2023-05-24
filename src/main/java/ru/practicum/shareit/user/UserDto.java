@@ -13,7 +13,6 @@ import javax.validation.constraints.NotEmpty;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserDto {
 
     private long id;

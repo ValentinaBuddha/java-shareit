@@ -41,7 +41,6 @@ public class UserServiceImpl implements UserService {
             User user = userRepository.save(UserMapper.toUser(userDto));
             log.info("Новый пользователь создан с идентификтором {}", user.getId());
             return UserMapper.toUserDto(user);
-
         } catch (DataIntegrityViolationException e) {
             log.info("Email {} уже используется", userDto.getEmail());
             throw new NotUniqueEmailException(String.format("Email %s уже используется.", userDto.getEmail()));

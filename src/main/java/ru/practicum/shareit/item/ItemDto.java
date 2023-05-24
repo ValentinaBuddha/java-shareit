@@ -1,14 +1,17 @@
 package ru.practicum.shareit.item;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.utils.Create;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDto {
 
     private long id;
@@ -20,8 +23,7 @@ public class ItemDto {
     private String description;
 
     @NotNull(groups = {Create.class})
-    private long ownerId;
-
-    @NotNull(groups = {Create.class})
     private Boolean available;
+
+    private User owner;
 }

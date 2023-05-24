@@ -1,21 +1,28 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotOwnerException;
+import ru.practicum.shareit.user.UserMapper;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.User;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+    @Transactional(readOnly = true)
     @Override
     public ItemDto getItemById(long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
@@ -23,12 +30,14 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getItemsByOwner(long userId) {
         userService.getUserById(userId);
         return itemRepository.findAllByOwnerId(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<ItemDto> getItemBySearch(String text) {
         if (text.isBlank()) {
@@ -39,9 +48,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto saveNewItem(ItemDto itemDto, long userId) {
-        userService.getUserById(userId);
+        User owner = UserMapper.toUser(userService.getUserById(userId));
         Item item = ItemMapper.toItem(itemDto);
-        item.setOwnerId(userId);
+        item.setOwner(owner);
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
 
@@ -53,7 +62,7 @@ public class ItemServiceImpl implements ItemService {
         String name = itemDto.getName();
         String description = itemDto.getDescription();
         Boolean available = itemDto.getAvailable();
-        if (item.getOwnerId() == userId) {
+        if (item.getOwner().getId() == userId) {
             if (name != null && !name.isBlank()) {
                 item.setName(name);
             }
