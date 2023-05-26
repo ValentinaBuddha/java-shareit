@@ -8,13 +8,15 @@ import javax.persistence.*;
 @Entity
 @Table(name = "items")
 @AllArgsConstructor
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String name;
@@ -28,4 +30,10 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
+
+    public Item(String name, String description, Boolean available) {
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }

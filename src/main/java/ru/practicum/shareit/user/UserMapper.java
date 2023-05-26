@@ -12,6 +12,13 @@ public class UserMapper {
         );
     }
 
+    public UserDtoShort toUserDtoShort(User user) {
+        return new UserDtoShort(
+                user.getId(),
+                user.getName()
+        );
+    }
+
     public User toUser(UserDto userDto) {
         return new User(
                 userDto.getId(),

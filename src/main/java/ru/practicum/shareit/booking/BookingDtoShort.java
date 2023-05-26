@@ -13,5 +13,4 @@ public class BookingDtoShort {
     private LocalDateTime end;
     private BookingStatus status;
     private long bookerId;
-
 }

@@ -1,71 +1,70 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.item.Item;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId);
+    List<Booking> findAllByBookerId(long bookerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
-            "AND current_timestamp BETWEEN b.start AND b.end " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndStateCurrentOrderByStartDesc(long bookerId);
+            "AND current_timestamp BETWEEN b.start AND b.end")
+    List<Booking> findAllByBookerIdAndStateCurrent(long bookerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
-            "AND current_timestamp > b.end " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndStatePastOrderByStartDesc(long brokerId);
+            "AND current_timestamp > b.end")
+    List<Booking> findAllByBookerIdAndStatePast(long brokerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.booker.id = ?1 " +
-            "AND current_timestamp < b.start " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdAndStateFutureOrderByStartDesc(long bookerId);
+            "AND current_timestamp < b.start")
+    List<Booking> findAllByBookerIdAndStateFuture(long bookerId, Sort start);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long bookerId, BookingStatus bookingStatus);
+    List<Booking> findAllByBookerIdAndStatus(long bookerId, BookingStatus bookingStatus, Sort start);
+
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.item.owner.id = ?1")
+    List<Booking> findAllByOwnerId(long ownerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = ?1 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerIdOrderByStartDesc(long ownerId);
+            "AND current_timestamp BETWEEN b.start AND b.end")
+    List<Booking> findAllByOwnerIdAndStateCurrent(long ownerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = ?1 " +
-            "AND current_timestamp BETWEEN b.start AND b.end " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerIdAndStateCurrentOrderByStartDesc(long ownerId);
+            "AND current_timestamp > b.end")
+    List<Booking> findAllByOwnerIdAndStatePast(long ownerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = ?1 " +
-            "AND current_timestamp < b.start " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerIdAndStateFutureOrderByStartDesc(long ownerId);
+            "AND current_timestamp < b.start")
+    List<Booking> findAllByOwnerIdAndStateFuture(long ownerId, Sort start);
 
     @Query("SELECT b FROM Booking b " +
             "WHERE b.item.owner.id = ?1 " +
-            "AND b.status = ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerIdAndStatusOrderByStartDesc(long ownerId, BookingStatus bookingStatus);
+            "AND b.status = ?2")
+    List<Booking> findAllByOwnerIdAndStatus(long ownerId, BookingStatus bookingStatus, Sort start);
 
-    @Query("SELECT b FROM Booking b " +
-            "WHERE b.item.owner.id = ?1 " +
-            "AND current_timestamp > b.end " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerIdAndStatePastOrderByStartDesc(long ownerId);
+    Optional<Booking> findFirstByItemIdAndStartLessThanEqualAndStatus(long itemId, LocalDateTime localDateTime,
+                                                                      BookingStatus bookingStatus, Sort end);
 
-    Optional<Booking> findFirstByItemIdAndStartBeforeAndStatusOrderByEndDesc(long itemId,
-                                                                             LocalDateTime localDateTime,
-                                                                             BookingStatus bookingStatus);
+    Optional<Booking> findFirstByItemIdAndStartAfterAndStatus(long itemId, LocalDateTime localDateTime,
+                                                              BookingStatus bookingStatus, Sort end);
 
-    Optional<Booking> findFirstByItemIdAndStartAfterAndStatusOrderByEndAsc(long itemId,
-                                                                           LocalDateTime localDateTime,
-                                                                           BookingStatus bookingStatus);
+    Optional<Booking> findFirstByItemInAndStartLessThanEqualAndStatus(List<Item> items, LocalDateTime thisMoment,
+                                                                      BookingStatus approved, Sort end);
+
+    Optional<Booking> findFirstByItemInAndStartAfterAndStatus(List<Item> items, LocalDateTime thisMoment,
+                                                              BookingStatus approved, Sort end);
 
     Boolean existsByBookerIdAndItemIdAndEndBefore(long bookerId, long itemId, LocalDateTime localDateTime);
+
 }

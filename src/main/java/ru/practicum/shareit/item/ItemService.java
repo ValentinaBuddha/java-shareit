@@ -6,15 +6,15 @@ import ru.practicum.shareit.item.comment.CommentDtoOut;
 import java.util.List;
 
 public interface ItemService {
-    ItemDto getItemById(long itemId, long userId);
+    ItemDtoOut getItemById(long itemId, long userId);
 
-    List<ItemDto> getItemsByOwner(long userId);
+    List<ItemDtoOut> getItemsByOwner(long userId);
 
-    List<ItemDto> getItemBySearch(String text);
+    List<ItemDtoOut> getItemBySearch(String text);
 
-    ItemDto saveNewItem(ItemDto itemDto, long userId);
+    ItemDtoOut saveNewItem(ItemDtoIn itemDtoIn, long userId);
 
-    ItemDto updateItem(long itemId, ItemDto itemDto, long userId);
+    ItemDtoOut updateItem(long itemId, ItemDtoIn itemDtoIn, long userId);
 
     CommentDtoOut saveNewComment(long itemId, CommentDtoIn commentDtoIn, long userId);
 }
