@@ -168,12 +168,12 @@ public class BookingServiceImpl implements BookingService {
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Booking.class)));
     }
 
-    private User getUser (long userId) {
+    private User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", User.class)));
     }
 
-    private Item getItem (long itemId) {
+    private Item getItem(long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
     }
