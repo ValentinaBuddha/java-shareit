@@ -61,10 +61,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findFirstByItemIdAndStartAfterAndStatus(long itemId, LocalDateTime localDateTime,
                                                               BookingStatus bookingStatus, Sort end);
 
-    List<Booking> findFirstByItemInAndStartLessThanEqualAndStatus(List<Item> items, LocalDateTime thisMoment,
+    List<Booking> findByItemInAndStartLessThanEqualAndStatus(List<Item> items, LocalDateTime thisMoment,
                                                                       BookingStatus approved, Sort end);
 
-    List<Booking> findFirstByItemInAndStartAfterAndStatus(List<Item> items, LocalDateTime thisMoment,
+    List<Booking> findByItemInAndStartAfterAndStatus(List<Item> items, LocalDateTime thisMoment,
                                                               BookingStatus approved, Sort end);
 
     Boolean existsByBookerIdAndItemIdAndEndBefore(long bookerId, long itemId, LocalDateTime localDateTime);

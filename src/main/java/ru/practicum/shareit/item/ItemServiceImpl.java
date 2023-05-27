@@ -149,16 +149,16 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime thisMoment = LocalDateTime.now();
 
         Map<Item, Booking> itemsWithLastBookings = bookingRepository
-                .findFirstByItemInAndStartLessThanEqualAndStatus(items, thisMoment,
+                .findByItemInAndStartLessThanEqualAndStatus(items, thisMoment,
                         BookingStatus.APPROVED, Sort.by(DESC, "end"))
                 .stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity()));
+                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (o1, o2) -> o1));
 
         Map<Item, Booking> itemsWithNextBookings = bookingRepository
-                .findFirstByItemInAndStartAfterAndStatus(items, thisMoment,
+                .findByItemInAndStartAfterAndStatus(items, thisMoment,
                         BookingStatus.APPROVED, Sort.by(ASC, "end"))
                 .stream()
-                .collect(Collectors.toMap(Booking::getItem, Function.identity()));
+                .collect(Collectors.toMap(Booking::getItem, Function.identity(), (o1, o2) -> o1));
 
         Map<Item, List<Comment>> itemsWithComments = commentRepository
                 .findByItemIn(items, Sort.by(DESC, "created"))
