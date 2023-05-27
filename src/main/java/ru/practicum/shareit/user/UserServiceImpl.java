@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +38,6 @@ public class UserServiceImpl implements UserService {
     public UserDto saveNewUser(UserDto userDto) {
         log.info("Создание нового пользователя {}", userDto.getName());
         User user = userRepository.save(UserMapper.toUser(userDto));
-        log.info("Новый пользователь создан с идентификтором {}", user.getId());
         return UserMapper.toUserDto(user);
     }
 
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         if (email != null && !email.isBlank()) {
             oldUser.setEmail(email);
         }
-        return UserMapper.toUserDto(userRepository.save(oldUser));
+        return UserMapper.toUserDto(oldUser);
     }
 
     @Override

@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.comment.CommentDtoIn;
-import ru.practicum.shareit.item.comment.CommentDtoOut;
+import ru.practicum.shareit.item.comment.dto.CommentDtoIn;
+import ru.practicum.shareit.item.comment.dto.CommentDtoOut;
+import ru.practicum.shareit.item.dto.ItemDtoIn;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.utils.Create;
 
 import java.util.List;

@@ -5,14 +5,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
-import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotBookerException;
 import ru.practicum.shareit.exception.NotOwnerException;
 import ru.practicum.shareit.item.comment.*;
+import ru.practicum.shareit.item.comment.dto.CommentDtoIn;
+import ru.practicum.shareit.item.comment.dto.CommentDtoOut;
+import ru.practicum.shareit.item.comment.dto.CommentMapper;
+import ru.practicum.shareit.item.dto.ItemDtoIn;
+import ru.practicum.shareit.item.dto.ItemDtoOut;
+import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -162,11 +168,13 @@ public class ItemServiceImpl implements ItemService {
         List<ItemDtoOut> itemDtoOuts = new ArrayList<>();
         for (Item item : items) {
             ItemDtoOut itemDtoOut = ItemMapper.toItemDtoOut(item);
-            if (itemsWithLastBookings.size() > 0 && itemsWithLastBookings.get(item) != null) {
-                itemDtoOut.setLastBooking(BookingMapper.toBookingDtoShort(itemsWithLastBookings.get(item)));
+            Booking lastBooking = itemsWithLastBookings.get(item);
+            if (itemsWithLastBookings.size() > 0 && lastBooking != null) {
+                itemDtoOut.setLastBooking(BookingMapper.toBookingDtoShort(lastBooking));
             }
-            if (itemsWithNextBookings.size() > 0 && itemsWithNextBookings.get(item) != null) {
-                itemDtoOut.setNextBooking(BookingMapper.toBookingDtoShort(itemsWithNextBookings.get(item)));
+            Booking nextBooking = itemsWithNextBookings.get(item);
+            if (itemsWithNextBookings.size() > 0 && nextBooking != null) {
+                itemDtoOut.setNextBooking(BookingMapper.toBookingDtoShort(nextBooking));
             }
             List<CommentDtoOut> commentDtoOuts = itemsWithComments.getOrDefault(item, Collections.emptyList())
                     .stream()
