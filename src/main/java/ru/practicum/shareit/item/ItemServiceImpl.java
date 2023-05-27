@@ -94,7 +94,7 @@ public class ItemServiceImpl implements ItemService {
         log.info("Получение вещи по владельцу {}", userId);
         getUser(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId);
-        return addBookingsAndCommentsForInList(items);
+        return addBookingsAndCommentsForList(items);
     }
 
     @Transactional(readOnly = true)
@@ -145,7 +145,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDtoOut;
     }
 
-    private List<ItemDtoOut> addBookingsAndCommentsForInList(List<Item> items) {
+    private List<ItemDtoOut> addBookingsAndCommentsForList(List<Item> items) {
         LocalDateTime thisMoment = LocalDateTime.now();
 
         Map<Item, Booking> itemsWithLastBookings = bookingRepository
