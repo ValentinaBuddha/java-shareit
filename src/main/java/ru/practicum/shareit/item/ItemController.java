@@ -42,19 +42,23 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoOut> getItemsByOwner(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoOut> getItemsByOwner(@RequestParam(defaultValue = "1") Integer from,
+                                            @RequestParam(defaultValue = "10") Integer size,
+                                            @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("GET / items / user {}", userId);
-        return itemService.getItemsByOwner(userId);
+        return itemService.getItemsByOwner(from, size, userId);
     }
 
     @GetMapping("/search")
-    public List<ItemDtoOut> getFilmBySearch(@RequestParam String text) {
+    public List<ItemDtoOut> getFilmBySearch(@RequestParam(defaultValue = "1") Integer from,
+                                            @RequestParam(defaultValue = "10") Integer size,
+                                            @RequestParam String text) {
         log.info("GET / search / {}", text);
-        return itemService.getItemBySearch(text);
+        return itemService.getItemBySearch(from, size, text);
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDtoOut addComment(@PathVariable long itemId,
+    public CommentDtoOut saveNewComment(@PathVariable long itemId,
                                     @Validated(Create.class) @RequestBody CommentDtoIn commentDtoIn,
                                     @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("POST / comment / item {}", itemId);

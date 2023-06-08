@@ -7,13 +7,17 @@ import ru.practicum.shareit.user.dto.UserMapper;
 @UtilityClass
 public class ItemMapper {
     public ItemDtoOut toItemDtoOut(Item item) {
-        return new ItemDtoOut(
+        ItemDtoOut itemDtoOut = new ItemDtoOut(
                 item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 UserMapper.toUserDtoShort(item.getOwner())
         );
+        if (item.getRequest() != null) {
+            itemDtoOut.setRequestId(item.getRequest().getId());
+        }
+        return itemDtoOut;
     }
 
     public ItemDtoShort toItemDtoShort(Item item) {
