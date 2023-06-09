@@ -86,7 +86,7 @@ class UserServiceTest {
 
         UserDto actualUser = userService.updateUser(id, userDto);
 
-        Assertions.assertEquals(userDto, actualUser);
+        Assertions.assertEquals(UserMapper.toUserDto(user), actualUser);
         verify(userRepository, times(1))
                 .findById(user.getId());
     }

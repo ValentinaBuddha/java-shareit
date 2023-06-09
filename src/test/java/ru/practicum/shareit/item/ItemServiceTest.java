@@ -12,6 +12,9 @@ import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.NotBookerException;
+import ru.practicum.shareit.exception.NotOwnerException;
+import ru.practicum.shareit.exception.WrongNumbersForPagingException;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDtoIn;
@@ -47,41 +50,33 @@ class ItemServiceTest {
 
     private final long id = 1L;
     private final User user = new User(id, "User", "user@mail.ru");
+    private final User notOwner = new User(2, "User2", "user2@mail.ru");
     private final ItemDtoIn itemDtoIn = new ItemDtoIn("item", "cool item", true, null);
-    private final ItemDtoOut itemDtoOut = new ItemDtoOut(
-            1,
-            "item",
-            "cool item",
-            true,
-            new UserDtoShort(1L, "User"));
-    private final Item item = new Item(
-            1L,
-            "item",
-            "cool item",
-            true,
-            user,
-            null);
-    private final CommentDtoOut commentDto = new CommentDtoOut(
-            1L,
-            "abc",
-            "User",
+    private final ItemDtoOut itemDtoOut = new ItemDtoOut(id, "item", "cool item", true,
+            new UserDtoShort(id, "User"));
+    private final Item item = new Item(id, "item", "cool item", true, user, null);
+    private final CommentDtoOut commentDto = new CommentDtoOut(id, "abc", "User",
             LocalDateTime.of(2023, 7, 1, 12, 12, 12));
-    private final Comment comment = new Comment(
-            1L,
-            "abc",
-            item,
-            user,
+    private final Comment comment = new Comment(id, "abc", item, user,
             LocalDateTime.of(2023, 7, 1, 12, 12, 12));
     private final Booking booking = new Booking(id, null, null, item, user, BookingStatus.WAITING);
 
     @Test
-    void saveNewItem() {
+    void saveNewItem_whenUserFound_thenSavedItem() {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(itemRepository.save(any())).thenReturn(item);
 
         ItemDtoOut actualItemDto = itemService.saveNewItem(itemDtoIn, id);
 
-        Assertions.assertEquals(itemDtoOut, actualItemDto);
+        Assertions.assertEquals(ItemMapper.toItemDtoOut(item), actualItemDto);
+        Assertions.assertNull(item.getRequest());
+    }
+
+    @Test
+    void saveNewItem_whenUserNotFound_thenNotSavedItem() {
+        doThrow(EntityNotFoundException.class).when(userRepository).findById(2L);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () -> itemService.saveNewItem(itemDtoIn, 2L));
     }
 
     @Test
@@ -93,13 +88,21 @@ class ItemServiceTest {
     }
 
     @Test
-    void updateItem() {
+    void updateItem_whenUserIsOwner_thenUpdatedItem() {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(itemRepository.findById(id)).thenReturn(Optional.of(item));
 
         ItemDtoOut actualItemDto = itemService.updateItem(id, itemDtoIn, id);
 
         Assertions.assertEquals(itemDtoOut, actualItemDto);
+    }
+
+    @Test
+    void updateItem_whenUserNotOwner_thenNotUpdatedItem() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(notOwner));
+        when(itemRepository.findById(id)).thenReturn(Optional.of(item));
+
+        Assertions.assertThrows(NotOwnerException.class, () -> itemService.updateItem(id, itemDtoIn, 2L));
     }
 
     @Test
@@ -128,7 +131,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void getItemsByOwner() {
+    void getItemsByOwner_CorrectArgumentsForPaging_thenReturnItems() {
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
         when(itemRepository.findAllByOwnerId(anyLong(), any())).thenReturn(List.of(item));
 
@@ -141,7 +144,13 @@ class ItemServiceTest {
     }
 
     @Test
-    void getItemBySearch() {
+    void getItemsByOwner_IncorrectArgumentsForPaging_thenExceptionThrown() {
+        Assertions.assertThrows(WrongNumbersForPagingException.class, () ->
+                itemService.getItemsByOwner(-1, 10, id));
+    }
+
+    @Test
+    void getItemBySearch_whenTextNotBlank_thenReturnItems() {
         when(itemRepository.search(any(), any())).thenReturn(List.of(item));
 
         List<ItemDtoOut> targetItems = itemService.getItemBySearch(0, 10, "abc");
@@ -153,7 +162,22 @@ class ItemServiceTest {
     }
 
     @Test
-    void saveNewComment() {
+    void getItemBySearch_whenTextIsBlank_thenReturnEmptyList() {
+        List<ItemDtoOut> targetItems = itemService.getItemBySearch(0, 10, "");
+
+        Assertions.assertTrue(targetItems.isEmpty());
+        Assertions.assertEquals(0, targetItems.size());
+        verify(itemRepository, never()).search(any(), any());
+    }
+
+    @Test
+    void getItemBySearch_IncorrectArgumentsForPaging_thenExceptionThrown() {
+        Assertions.assertThrows(WrongNumbersForPagingException.class, () ->
+                itemService.getItemsByOwner(0, 0, id));
+    }
+
+    @Test
+    void saveNewComment_whenUserWasBooker_thenSavedComment() {
         when(bookingRepository.existsByBookerIdAndItemIdAndEndBefore(anyLong(), anyLong(), any()))
                 .thenReturn(true);
         when(userRepository.findById(id)).thenReturn(Optional.of(user));
@@ -163,5 +187,14 @@ class ItemServiceTest {
         CommentDtoOut actualComment = itemService.saveNewComment(id, new CommentDtoIn("abc"), id);
 
         Assertions.assertEquals(commentDto, actualComment);
+    }
+
+    @Test
+    void saveNewComment_whenUserWasNotBooker_thenThrownException() {
+        doThrow(NotBookerException.class)
+                .when(bookingRepository).existsByBookerIdAndItemIdAndEndBefore(anyLong(), anyLong(), any());
+
+        Assertions.assertThrows(NotBookerException.class, () ->
+                itemService.saveNewComment(2L, new CommentDtoIn("abc"), id));
     }
 }

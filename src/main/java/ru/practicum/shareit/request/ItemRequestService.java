@@ -54,10 +54,10 @@ public class ItemRequestService {
 
     public List<ItemRequestDtoOut> getAllRequests(Integer from, Integer size, long userId) {
         log.info("Получение всех запросов постранично");
-        getUser(userId);
         if (from < 0 || size == 0) {
             throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
         }
+        getUser(userId);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
         List<ItemRequest> requests = requestRepository.findAllByRequestorIdIsNot(userId, pageable);
         return addItems(requests);

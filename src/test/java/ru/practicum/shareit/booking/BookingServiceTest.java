@@ -11,7 +11,7 @@ import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.exception.NotAvailableToBookOwnItemsException;
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,27 +42,23 @@ class BookingServiceTest {
 
     private final User user = new User(1L, "User", "user@mail.ru");
     private final User booker = new User(2L, "user2", "user2@mail.ru");
-    private final Item item = new Item(
-            1L,
-            "item",
-            "cool item",
-            true,
-            user,
-            null);
-    private final Booking booking = new Booking(
-            1L,
+    private final Item item = new Item(1L, "item", "cool", true, user, null);
+    private final Booking booking = new Booking(1L,
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
             LocalDateTime.of(2023, 7, 30, 12, 12, 12),
-            item,
-            booker,
-            BookingStatus.WAITING);
+            item, booker, BookingStatus.WAITING);
     private final BookingDtoIn bookingDtoIn = new BookingDtoIn(
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
-            LocalDateTime.of(2023, 7, 30, 12, 12, 12),
-            1L);
+            LocalDateTime.of(2023, 7, 30, 12, 12, 12), 1L);
+    private final BookingDtoIn bookingDtoInWrong = new BookingDtoIn(
+            LocalDateTime.of(2023, 7, 2, 12, 12, 12),
+            LocalDateTime.of(2023, 7, 1, 12, 12, 12), 1L);
+    private final BookingDtoIn bookingDtoWrongItem = new BookingDtoIn(
+            LocalDateTime.of(2023, 7, 1, 12, 12, 12),
+            LocalDateTime.of(2023, 7, 30, 12, 12, 12), 2L);
 
     @Test
-    void saveNewBooking() {
+    void saveNewBooking_whenItemAvailable_thenSavedBooking() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         when(bookingRepository.save(any())).thenReturn(booking);
@@ -75,6 +72,51 @@ class BookingServiceTest {
     }
 
     @Test
+    void saveNewBooking_whenUserNotFound_thenThrownException() {
+        doThrow(EntityNotFoundException.class).when(userRepository).findById(3L);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () ->
+                bookingService.saveNewBooking(bookingDtoIn, 3L));
+    }
+
+    @Test
+    void saveNewBooking_whenItemNotFound_thenThrownException() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
+        doThrow(EntityNotFoundException.class).when(itemRepository).findById(2L);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () ->
+                bookingService.saveNewBooking(bookingDtoWrongItem, 2L));
+    }
+
+    @Test
+    void saveNewBooking_whenItemNotAvailable_thenThrownException() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        item.setAvailable(false);
+
+        Assertions.assertThrows(ItemIsNotAvailableException.class, () ->
+                bookingService.saveNewBooking(bookingDtoIn, 2L));
+    }
+
+    @Test
+    void saveNewBooking_whenBookerIsOwner_thenThrownException() {
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+        Assertions.assertThrows(NotAvailableToBookOwnItemsException.class, () ->
+                bookingService.saveNewBooking(bookingDtoIn, 1L));
+    }
+
+    @Test
+    void saveNewBooking_whenIncorrectDatesOfBooking_thenThrownException() {
+        when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+        Assertions.assertThrows(WrongDatesException.class, () ->
+                bookingService.saveNewBooking(bookingDtoInWrong, 2L));
+    }
+
+    @Test
     void saveNewBooking_whenOwnerIsBooker_thenThrownException() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
@@ -85,9 +127,9 @@ class BookingServiceTest {
 
     @Test
     void approve() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         BookingDtoOut actualBooking = bookingService.approve(1L, true, 1L);
 
@@ -95,13 +137,39 @@ class BookingServiceTest {
     }
 
     @Test
-    void getBookingById() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+    void approve_whenBookingNotFound_thenThrownException() {
+        doThrow(EntityNotFoundException.class).when(bookingRepository).findById(2L);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () ->
+                bookingService.approve(2L, true, 1L));
+    }
+
+    @Test
+    void approve_whenItemAlreadyBooked_thenThrownException() {
         when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        booking.setStatus(BookingStatus.APPROVED);
+
+        Assertions.assertThrows(ItemIsNotAvailableException.class, () ->
+                bookingService.approve(1L, true, 1L));
+    }
+
+    @Test
+    void getBookingById_whenUserIsOwner_thenReturnBooking() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
 
         BookingDtoOut actualBooking = bookingService.getBookingById(1L, 1L);
 
         Assertions.assertEquals(BookingMapper.toBookingDtoOut(booking), actualBooking);
+    }
+
+    @Test
+    void getBookingById_whenUserIsNotAuthorOrOwner_thenThrownException() {
+        when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        Assertions.assertThrows(IllegalVewAndUpdateException.class, () ->
+                bookingService.getBookingById(1L, 3L));
     }
 
     @Test
@@ -152,6 +220,18 @@ class BookingServiceTest {
         List<BookingDtoOut> actualBookings = bookingService.getAllByBooker(0, 10, "WAITING", 2L);
 
         Assertions.assertEquals(List.of(BookingMapper.toBookingDtoOut(booking)), actualBookings);
+    }
+
+    @Test
+    void getAllByBooker_whenIncorrectArgumentsForPaging_thenExceptionThrown() {
+        Assertions.assertThrows(WrongNumbersForPagingException.class, () ->
+                bookingService.getAllByBooker(-1, 10, "ALL", 2L));
+    }
+
+    @Test
+    void getAllByBooker_whenStateUnsupported_thenExceptionThrown() {
+        Assertions.assertThrows(UnsupportedStatusException.class, () ->
+                bookingService.getAllByBooker(0, 10, "a", 2L));
     }
 
     @Test

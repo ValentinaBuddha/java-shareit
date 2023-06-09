@@ -67,8 +67,7 @@ public class ItemService {
     public ItemDtoOut updateItem(long itemId, ItemDtoIn itemDtoIn, long userId) {
         log.info("Обновление вещи {} с идентификатором {}", itemDtoIn.getName(), itemId);
         getUser(userId);
-        Item item = itemRepository.findById(itemId).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
+        Item item = getItem(itemId);
         String name = itemDtoIn.getName();
         String description = itemDtoIn.getDescription();
         Boolean available = itemDtoIn.getAvailable();
@@ -92,17 +91,17 @@ public class ItemService {
     @Transactional(readOnly = true)
     public ItemDtoOut getItemById(long itemId, long userId) {
         log.info("Получение вещи по идентификатору {}", itemId);
-        return itemRepository.findById(itemId).map(item -> addBookingsAndComments(item, userId)).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
+        final Item item = getItem(itemId);
+        return addBookingsAndComments(item, userId);
     }
 
     @Transactional(readOnly = true)
     public List<ItemDtoOut> getItemsByOwner(Integer from, Integer size, long userId) {
         log.info("Получение вещи по владельцу {}", userId);
-        getUser(userId);
         if (from < 0 || size == 0) {
             throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
         }
+        getUser(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size));
         return addBookingsAndCommentsForList(items);
     }
@@ -121,12 +120,11 @@ public class ItemService {
     }
 
     public CommentDtoOut saveNewComment(long itemId, CommentDtoIn commentDtoIn, long userId) {
-        User user = getUser(userId);
-        Item item = itemRepository.findById(itemId).orElseThrow(() ->
-                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
-        if (!bookingRepository.existsByBookerIdAndItemIdAndEndBefore(user.getId(), item.getId(), LocalDateTime.now())) {
+        if (!bookingRepository.existsByBookerIdAndItemIdAndEndBefore(userId, itemId, LocalDateTime.now())) {
             throw new NotBookerException("Пользователь не пользовался вещью");
         }
+        User user = getUser(userId);
+        Item item = getItem(itemId);
         Comment comment = commentRepository.save(CommentMapper.toComment(commentDtoIn, item, user));
         return CommentMapper.toCommentDtoOut(comment);
     }
@@ -202,5 +200,10 @@ public class ItemService {
     private User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", User.class)));
+    }
+
+    private Item getItem(long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(() ->
+                new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
     }
 }

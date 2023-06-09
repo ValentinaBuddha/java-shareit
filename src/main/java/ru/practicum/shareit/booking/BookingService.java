@@ -54,15 +54,15 @@ public class BookingService {
     }
 
     public BookingDtoOut approve(long bookingId, Boolean isApproved, long userId) {
-        User owner = getUser(userId);
         Booking booking = getById(bookingId);
-        Item item = getItem(booking.getItem().getId());
         if (booking.getStatus() != BookingStatus.WAITING) {
             throw new ItemIsNotAvailableException("Вещь уже забронирована");
         }
-        if (owner.getId() != item.getOwner().getId()) {
+        Item item = getItem(booking.getItem().getId());
+        if (userId != item.getOwner().getId()) {
             throw new IllegalVewAndUpdateException("Подтвердить бронирование может только собственник вещи");
         }
+        getUser(userId);
         BookingStatus newBookingStatus = isApproved ? BookingStatus.APPROVED : BookingStatus.REJECTED;
         booking.setStatus(newBookingStatus);
         log.info("Бронирование с идентификатором {} обновлено", booking.getId());
@@ -76,45 +76,41 @@ public class BookingService {
         User booker = booking.getBooker();
         User owner = getUser(booking.getItem().getOwner().getId());
         if (booker.getId() != userId && owner.getId() != userId) {
-            throw new IllegalVewAndUpdateException("Только автор или владелец может просматривать данное броинрование");
+            throw new IllegalVewAndUpdateException("Только автор или владелец может просматривать данное бронирование");
         }
         return BookingMapper.toBookingDtoOut(booking);
     }
 
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByBooker(Integer from, Integer size, String state, long bookerId) {
-        User booker = getUser(bookerId);
-        List<Booking> bookings;
+        checkArgumentsForPaging(from,size);
         BookingState bookingState;
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
-        }
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
+        getUser(bookerId);
+        List<Booking> bookings;
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.findAllByBookerId(booker.getId(), pageable);
+                bookings = bookingRepository.findAllByBookerId(bookerId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByBookerIdAndStateCurrent(booker.getId(), pageable);
+                bookings = bookingRepository.findAllByBookerIdAndStateCurrent(bookerId, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByBookerIdAndStatePast(booker.getId(), pageable);
+                bookings = bookingRepository.findAllByBookerIdAndStatePast(bookerId, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByBookerIdAndStateFuture(booker.getId(), pageable);
+                bookings = bookingRepository.findAllByBookerIdAndStateFuture(bookerId, pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByBookerIdAndStatus(booker.getId(),
-                        BookingStatus.WAITING, pageable);
+                bookings = bookingRepository.findAllByBookerIdAndStatus(bookerId, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByBookerIdAndStatus(booker.getId(),
-                        BookingStatus.REJECTED, pageable);
+                bookings = bookingRepository.findAllByBookerIdAndStatus(bookerId, BookingStatus.REJECTED, pageable);
                 break;
             default:
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
@@ -124,38 +120,34 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByOwner(Integer from, Integer size, String state, long ownerId) {
-        User owner = getUser(ownerId);
-        List<Booking> bookings;
+        checkArgumentsForPaging(from,size);
         BookingState bookingState;
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
-        }
-        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         try {
             bookingState = BookingState.valueOf(state);
         } catch (IllegalArgumentException e) {
             throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
         }
+        getUser(ownerId);
+        List<Booking> bookings;
+        Pageable pageable = PageRequest.of(from / size, size, Sort.by("start").descending());
         switch (bookingState) {
             case ALL:
-                bookings = bookingRepository.findAllByOwnerId(owner.getId(), pageable);
+                bookings = bookingRepository.findAllByOwnerId(ownerId, pageable);
                 break;
             case CURRENT:
-                bookings = bookingRepository.findAllByOwnerIdAndStateCurrent(owner.getId(), pageable);
+                bookings = bookingRepository.findAllByOwnerIdAndStateCurrent(ownerId, pageable);
                 break;
             case PAST:
-                bookings = bookingRepository.findAllByOwnerIdAndStatePast(owner.getId(), pageable);
+                bookings = bookingRepository.findAllByOwnerIdAndStatePast(ownerId, pageable);
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByOwnerIdAndStateFuture(owner.getId(), pageable);
+                bookings = bookingRepository.findAllByOwnerIdAndStateFuture(ownerId, pageable);
                 break;
             case WAITING:
-                bookings = bookingRepository.findAllByOwnerIdAndStatus(owner.getId(),
-                        BookingStatus.WAITING, pageable);
+                bookings = bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.WAITING, pageable);
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByOwnerIdAndStatus(owner.getId(),
-                        BookingStatus.REJECTED, pageable);
+                bookings = bookingRepository.findAllByOwnerIdAndStatus(ownerId, BookingStatus.REJECTED, pageable);
                 break;
             default:
                 throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
@@ -178,5 +170,11 @@ public class BookingService {
     private Item getItem(long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
+    }
+
+    private void checkArgumentsForPaging(Integer from, Integer size) {
+        if (from < 0 || size == 0) {
+            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
+        }
     }
 }

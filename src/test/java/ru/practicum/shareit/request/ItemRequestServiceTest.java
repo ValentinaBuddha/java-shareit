@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.WrongNumbersForPagingException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -21,6 +23,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,30 +40,10 @@ class ItemRequestServiceTest {
 
     private final User requestor = new User(2L, "user2", "user2@mail.ru");
     private final User user = new User(1L, "User", "user@mail.ru");
-    private final ItemRequest request = new ItemRequest(
-            1L,
-            "description",
-            requestor,
-            LocalDateTime.now());
-    private final ItemRequest requestSecond = new ItemRequest(
-            2L,
-            "description2",
-            user,
-            LocalDateTime.now());
-    private final Item item = new Item(
-            1L,
-            "item",
-            "cool item",
-            true,
-            user,
-            request);
-    private final Item itemSecond = new Item(
-            2L,
-            "item2",
-            "cool item",
-            true,
-            requestor,
-            requestSecond);
+    private final ItemRequest request = new ItemRequest(1L, "description", requestor, LocalDateTime.now());
+    private final ItemRequest requestSecond = new ItemRequest(2L, "2", user, LocalDateTime.now());
+    private final Item item = new Item(1L, "item", "cool", true, user, request);
+    private final Item itemSecond = new Item(2L, "i2", "2", true, requestor, requestSecond);
 
     @Test
     void saveNewRequest() {
@@ -74,7 +57,7 @@ class ItemRequestServiceTest {
     }
 
     @Test
-    void getRequestsByRequestor() {
+    void getRequestsByRequestor_whenUserFound_thenSavedRequest() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(requestor));
         when(requestRepository.findAllByRequestorId(anyLong(), any())).thenReturn(List.of(request));
         when(itemRepository.findAllByRequestId(1L)).thenReturn(List.of(item));
@@ -87,7 +70,15 @@ class ItemRequestServiceTest {
     }
 
     @Test
-    void getAllRequests() {
+    void getRequestsByRequestor_whenUserNotFound_thenThrownException() {
+        doThrow(EntityNotFoundException.class).when(userRepository).findById(3L);
+
+        Assertions.assertThrows(EntityNotFoundException.class, () ->
+                requestService.getRequestsByRequestor(3L));
+    }
+
+    @Test
+    void getAllRequests_whenCorrectPageArguments_thenReturnRequests() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(requestor));
         when(requestRepository.findAllByRequestorIdIsNot(anyLong(), any())).thenReturn(List.of(requestSecond));
         when(itemRepository.findAllByRequestId(anyLong())).thenReturn(List.of(itemSecond));
@@ -97,6 +88,12 @@ class ItemRequestServiceTest {
         List<ItemRequestDtoOut> actualRequests = requestService.getAllRequests(0, 10, 2L);
 
         Assertions.assertEquals(List.of(requestDtoOut), actualRequests);
+    }
+
+    @Test
+    void getAllRequests_whenIncorrectPageArguments_thenThrownException() {
+        Assertions.assertThrows(WrongNumbersForPagingException.class, () ->
+                requestService.getAllRequests(-1, 10, 2L));
     }
 
     @Test
