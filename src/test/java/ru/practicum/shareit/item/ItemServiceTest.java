@@ -61,8 +61,17 @@ class ItemServiceTest {
             true,
             user,
             null);
-    private final CommentDtoOut commentDto = new CommentDtoOut(1L, "abc", "User", LocalDateTime.now());
-    private final Comment comment = new Comment(1L, "abc", item, user, LocalDateTime.now());
+    private final CommentDtoOut commentDto = new CommentDtoOut(
+            1L,
+            "abc",
+            "User",
+            LocalDateTime.of(2023, 7, 1, 12, 12, 12));
+    private final Comment comment = new Comment(
+            1L,
+            "abc",
+            item,
+            user,
+            LocalDateTime.of(2023, 7, 1, 12, 12, 12));
     private final Booking booking = new Booking(id, null, null, item, user, BookingStatus.WAITING);
 
     @Test
