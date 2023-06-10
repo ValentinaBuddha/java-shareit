@@ -50,7 +50,7 @@ class ItemServiceTest {
 
     private final long id = 1L;
     private final User user = new User(id, "User", "user@mail.ru");
-    private final User notOwner = new User(2, "User2", "user2@mail.ru");
+    private final User notOwner = new User(2L, "User2", "user2@mail.ru");
     private final ItemDtoIn itemDtoIn = new ItemDtoIn("item", "cool item", true, null);
     private final ItemDtoOut itemDtoOut = new ItemDtoOut(id, "item", "cool item", true,
             new UserDtoShort(id, "User"));
