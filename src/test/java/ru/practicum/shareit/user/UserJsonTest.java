@@ -20,7 +20,7 @@ public class UserJsonTest {
 
         JsonContent<UserDto> result = json.write(userDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1L);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("user");
         assertThat(result).extractingJsonPathStringValue("$.email").isEqualTo("user@mail.ru");
     }

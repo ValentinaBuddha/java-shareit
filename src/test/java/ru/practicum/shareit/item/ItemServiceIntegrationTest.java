@@ -28,11 +28,11 @@ class ItemServiceIntegrationTest {
     private final ItemService itemService;
     private final UserService userService;
 
-    UserDto userDto = new UserDto(1L, "User", "user@mail.ru");
-    private final ItemDtoIn itemDtoIn = new ItemDtoIn("item", "cool item", true, null);
-
     @Test
     void saveNewItem() {
+        UserDto userDto = new UserDto(1L, "User", "user@mail.ru");
+        ItemDtoIn itemDtoIn = new ItemDtoIn("item", "cool item", true, null);
+
         userService.saveNewUser(userDto);
         itemService.saveNewItem(itemDtoIn, 1L);
 
