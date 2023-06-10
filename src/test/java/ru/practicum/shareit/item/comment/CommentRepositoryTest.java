@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item.comment;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,13 @@ class CommentRepositoryTest {
         userRepository.save(user);
         itemRepository.save(item);
         commentRepository.save(comment);
+    }
+
+    @AfterEach
+    void clean() {
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
+        commentRepository.deleteAll();
     }
 
     @Test

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.item;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,12 @@ class ItemRepositoryTest {
     void setUp() {
         userRepository.save(user);
         itemRepository.save(item);
+    }
+
+    @AfterEach
+    void clean() {
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
     }
 
 //    @Test
