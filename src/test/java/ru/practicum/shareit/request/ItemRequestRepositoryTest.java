@@ -1,5 +1,6 @@
 package ru.practicum.shareit.request;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ class ItemRequestRepositoryTest {
     private BookingRepository bookingRepository;
 
     private final User user = new User(null, "user", "user@mail.ru");
-    private final User requestor = new User(2L, "user2", "user2@mail.ru");
+    private final User requestor = new User(null, "user2", "user2@mail.ru");
     private final Item item = new Item(null, "item", "cool", true, user, null);
     private final Booking booking = new Booking(1L,
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
@@ -48,6 +49,14 @@ class ItemRequestRepositoryTest {
         itemRepository.save(item);
         bookingRepository.save(booking);
         requestRepository.save(request);
+    }
+
+    @AfterEach
+    void clean() {
+        userRepository.deleteAll();
+        itemRepository.deleteAll();
+        bookingRepository.deleteAll();
+        requestRepository.deleteAll();
     }
 
     @Test

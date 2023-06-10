@@ -29,9 +29,9 @@ class BookingRepositoryTest {
     @Autowired
     private BookingRepository bookingRepository;
 
-    private final User user = new User(1L, "user", "user@mail.ru");
-    private final User booker = new User(2L, "user2", "user2@mail.ru");
-    private final Item item = new Item(1L, "item", "cool", true, user, null);
+    private final User user = new User(null, "user", "user@mail.ru");
+    private final User booker = new User(null, "user2", "user2@mail.ru");
+    private final Item item = new Item(null, "item", "cool", true, user, null);
     private final Booking booking = new Booking(1L,
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
             LocalDateTime.of(2023, 7, 30, 12, 12, 12),
