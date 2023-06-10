@@ -38,7 +38,7 @@ public class BookingService {
         if (!item.getAvailable()) {
             throw new ItemIsNotAvailableException("Вещь недоступна для брони");
         }
-        if (booker.getId() == item.getOwner().getId()) {
+        if (userId == item.getOwner().getId()) {
             throw new NotAvailableToBookOwnItemsException("Функция бронировать собственную вещь отсутствует");
         }
         if (!bookingDtoIn.getEnd().isAfter(bookingDtoIn.getStart()) ||
