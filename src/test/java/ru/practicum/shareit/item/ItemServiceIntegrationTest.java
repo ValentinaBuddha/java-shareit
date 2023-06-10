@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
+import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserService;
 import ru.practicum.shareit.user.dto.UserDto;
 
@@ -36,12 +37,13 @@ class ItemServiceIntegrationTest {
         userService.saveNewUser(userDto);
         itemService.saveNewItem(itemDtoIn, 1L);
 
-        TypedQuery<Item> query = em.createQuery("Select i from Item i where i.name like :item", Item.class);
-        Item item = query.setParameter("item", itemDtoIn.getName()).getSingleResult();
+        TypedQuery<User> queryUser = em.createQuery("Select u from User u where u.name like :nameUser", User.class);
+        User user = queryUser.setParameter("nameUser", userDto.getName()).getSingleResult();
+        TypedQuery<Item> queryItem = em.createQuery("Select i from Item i where i.name like :item", Item.class);
+        Item item = queryItem.setParameter("item", itemDtoIn.getName()).getSingleResult();
 
         assertThat(item.getId(), notNullValue());
         assertThat(item.getName(), equalTo(itemDtoIn.getName()));
         assertThat(item.getDescription(), equalTo(itemDtoIn.getDescription()));
     }
-
 }
