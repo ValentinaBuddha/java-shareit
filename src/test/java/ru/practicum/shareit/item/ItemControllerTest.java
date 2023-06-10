@@ -135,7 +135,6 @@ class ItemControllerTest {
                 .andExpect(content().json(mapper.writeValueAsString(commentDtoOut)))
                 .andExpect(jsonPath("$.id", is(commentDtoOut.getId()), Long.class))
                 .andExpect(jsonPath("$.text", is(commentDtoOut.getText())))
-                .andExpect(jsonPath("$.authorName", is(commentDtoOut.getAuthorName())))
-                .andExpect(jsonPath("$.created", is(commentDtoOut.getCreated().toString())));
+                .andExpect(jsonPath("$.authorName", is(commentDtoOut.getAuthorName())));
     }
 }
