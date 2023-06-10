@@ -12,7 +12,6 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
 
 @DataJpaTest
 class ItemRepositoryTest {
@@ -35,7 +34,7 @@ class ItemRepositoryTest {
     void findAllByOwnerId() {
         List<Item> items = itemRepository.findAllByOwnerId(1L, Pageable.ofSize(10));
 
-        assertThat(items.get(0).getId(), notNullValue());
+        assertThat(items.get(0).getId(), equalTo(1L));
         assertThat(items.get(0).getName(), equalTo(item.getName()));
         assertThat(items.size(), equalTo(1));
     }
