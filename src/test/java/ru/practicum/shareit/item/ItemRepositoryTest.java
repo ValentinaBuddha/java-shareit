@@ -22,8 +22,8 @@ class ItemRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    private final User user = new User(null, "user", "user@mail.ru");
-    private final Item item = new Item(null, "item", "cool", true, user, null);
+    private final User user = new User(1L, "user", "user@mail.ru");
+    private final Item item = new Item(1L, "item", "cool", true, user, null);
 
     @BeforeEach
     void setUp() {

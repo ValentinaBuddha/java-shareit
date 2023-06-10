@@ -28,9 +28,9 @@ class BookingRepositoryTest {
     @Autowired
     private BookingRepository bookingRepository;
 
-    private final User user = new User(null, "user", "user@mail.ru");
+    private final User user = new User(1L, "user", "user@mail.ru");
     private final User booker = new User(2L, "user2", "user2@mail.ru");
-    private final Item item = new Item(null, "item", "cool", true, user, null);
+    private final Item item = new Item(1L, "item", "cool", true, user, null);
     private final Booking booking = new Booking(1L,
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
             LocalDateTime.of(2023, 7, 30, 12, 12, 12),
@@ -46,7 +46,7 @@ class BookingRepositoryTest {
 
     @Test
     void findAllByBookerId() {
-        List<Booking> bookings = bookingRepository.findAllByBookerId(1L, Pageable.ofSize(10));
+        List<Booking> bookings = bookingRepository.findAllByBookerId(2L, Pageable.ofSize(10));
 
         assertThat(bookings.get(0).getId(), equalTo(booking.getId()));
         assertThat(bookings.size(), equalTo(1));
