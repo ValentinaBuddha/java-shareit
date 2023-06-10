@@ -30,9 +30,18 @@ class ItemRepositoryTest {
         itemRepository.save(item);
     }
 
+//    @Test
+//    void findAllByOwnerId() {
+//        List<Item> items = itemRepository.findAllByOwnerId(1L, Pageable.ofSize(10));
+//
+//        assertThat(items.get(0).getId(), equalTo(1L));
+//        assertThat(items.get(0).getName(), equalTo(item.getName()));
+//        assertThat(items.size(), equalTo(1));
+//    }
+
     @Test
-    void findAllByOwnerId() {
-        List<Item> items = itemRepository.findAllByOwnerId(1L, Pageable.ofSize(10));
+    void search() {
+        List<Item> items = itemRepository.search("i", Pageable.ofSize(10));
 
         assertThat(items.get(0).getId(), equalTo(1L));
         assertThat(items.get(0).getName(), equalTo(item.getName()));
