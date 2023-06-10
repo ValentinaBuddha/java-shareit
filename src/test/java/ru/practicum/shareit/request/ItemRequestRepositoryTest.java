@@ -1,11 +1,11 @@
 package ru.practicum.shareit.request;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Sort;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -51,15 +51,8 @@ class ItemRequestRepositoryTest {
         requestRepository.save(request);
     }
 
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
-        bookingRepository.deleteAll();
-        requestRepository.deleteAll();
-    }
-
     @Test
+    @DirtiesContext
     void findAllByRequestorId() {
         List<ItemRequest> requests = requestRepository.findAllByRequestorId(2L, Sort.by(DESC, "created"));
 

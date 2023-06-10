@@ -1,11 +1,11 @@
 package ru.practicum.shareit.booking;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.Item;
@@ -45,14 +45,8 @@ class BookingRepositoryTest {
         bookingRepository.save(booking);
     }
 
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
-        bookingRepository.deleteAll();
-    }
-
     @Test
+    @DirtiesContext
     void findAllByBookerId() {
         List<Booking> bookings = bookingRepository.findAllByBookerId(2L, Pageable.ofSize(10));
 

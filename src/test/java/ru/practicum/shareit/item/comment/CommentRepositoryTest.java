@@ -1,10 +1,10 @@
 package ru.practicum.shareit.item.comment;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
@@ -40,14 +40,8 @@ class CommentRepositoryTest {
         commentRepository.save(comment);
     }
 
-    @AfterEach
-    void clean() {
-        userRepository.deleteAll();
-        itemRepository.deleteAll();
-        commentRepository.deleteAll();
-    }
-
     @Test
+    @DirtiesContext
     void findAllByItemId() {
         List<Comment> comments = commentRepository.findAllByItemId(item.getId());
 

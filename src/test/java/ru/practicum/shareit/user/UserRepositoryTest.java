@@ -18,7 +18,7 @@ class UserRepositoryTest {
     private final User user = new User(null, "user", "user@mail.ru");
 
     @Test
-//    @DirtiesContext
+    @DirtiesContext
     void testSaveUser() {
         assertThat(user.getId(), equalTo(null));
         userRepository.save(user);
