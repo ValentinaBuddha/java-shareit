@@ -23,7 +23,6 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,7 +70,7 @@ class ItemRequestServiceTest {
 
     @Test
     void getRequestsByRequestor_whenUserNotFound_thenThrownException() {
-        doThrow(EntityNotFoundException.class).when(userRepository).findById(3L);
+        when((userRepository).findById(3L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () ->
                 requestService.getRequestsByRequestor(3L));

@@ -74,7 +74,7 @@ class ItemServiceTest {
 
     @Test
     void saveNewItem_whenUserNotFound_thenNotSavedItem() {
-        doThrow(EntityNotFoundException.class).when(userRepository).findById(2L);
+        when((userRepository).findById(2L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> itemService.saveNewItem(itemDtoIn, 2L));
     }
@@ -125,7 +125,7 @@ class ItemServiceTest {
 
     @Test
     void getItemById_whenItemNotFound_thenExceptionThrown() {
-        doThrow(EntityNotFoundException.class).when(itemRepository).findById(2L);
+        when((itemRepository).findById(2L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> itemService.getItemById(2L, id));
     }
@@ -191,8 +191,7 @@ class ItemServiceTest {
 
     @Test
     void saveNewComment_whenUserWasNotBooker_thenThrownException() {
-        doThrow(NotBookerException.class)
-                .when(bookingRepository).existsByBookerIdAndItemIdAndEndBefore(anyLong(), anyLong(), any());
+        when((bookingRepository).existsByBookerIdAndItemIdAndEndBefore(anyLong(), anyLong(), any())).thenReturn(false);
 
         Assertions.assertThrows(NotBookerException.class, () ->
                 itemService.saveNewComment(2L, new CommentDtoIn("abc"), id));

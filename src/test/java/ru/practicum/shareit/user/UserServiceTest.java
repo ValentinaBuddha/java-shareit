@@ -52,7 +52,7 @@ class UserServiceTest {
 
     @Test
     void getUserById_whenUserNotFound_thenExceptionThrown() {
-        doThrow(EntityNotFoundException.class).when(userRepository).findById(2L);
+        when((userRepository).findById(anyLong())).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () -> userService.getUserById(2L));
     }
@@ -96,9 +96,5 @@ class UserServiceTest {
         userService.deleteUser(1L);
         verify(userRepository, times(1))
                 .deleteById(1L);
-    }
-
-    @Test
-    void saveNewUser() {
     }
 }

@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +72,7 @@ class BookingServiceTest {
 
     @Test
     void saveNewBooking_whenUserNotFound_thenThrownException() {
-        doThrow(EntityNotFoundException.class).when(userRepository).findById(3L);
+        when((userRepository).findById(3L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () ->
                 bookingService.saveNewBooking(bookingDtoIn, 3L));
@@ -82,7 +81,7 @@ class BookingServiceTest {
     @Test
     void saveNewBooking_whenItemNotFound_thenThrownException() {
         when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
-        doThrow(EntityNotFoundException.class).when(itemRepository).findById(2L);
+        when((itemRepository).findById(2L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () ->
                 bookingService.saveNewBooking(bookingDtoWrongItem, 2L));
@@ -138,7 +137,7 @@ class BookingServiceTest {
 
     @Test
     void approve_whenBookingNotFound_thenThrownException() {
-        doThrow(EntityNotFoundException.class).when(bookingRepository).findById(2L);
+        when((bookingRepository).findById(2L)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(EntityNotFoundException.class, () ->
                 bookingService.approve(2L, true, 1L));
