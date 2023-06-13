@@ -39,6 +39,10 @@ class BookingControllerTest {
             LocalDateTime.now().plusDays(1),
             LocalDateTime.now().plusDays(2),
             1L);
+    private final BookingDtoIn bookingNullStart = new BookingDtoIn(
+            null,
+            LocalDateTime.now().plusDays(2),
+            1L);
     private final BookingDtoOut bookingDtoOut = new BookingDtoOut(
             1L,
             LocalDateTime.now().plusDays(1),
@@ -59,6 +63,17 @@ class BookingControllerTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(bookingDtoOut)));
+    }
+
+    @Test
+    void saveNewBooking_whenNoStart_thenThrownException() throws Exception {
+        mvc.perform(post("/bookings")
+                        .content(mapper.writeValueAsString(bookingNullStart))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -83,7 +83,6 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByBooker(Integer from, Integer size, String state, long bookerId) {
-        checkArgumentsForPaging(from,size);
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
@@ -120,7 +119,6 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByOwner(Integer from, Integer size, String state, long ownerId) {
-        checkArgumentsForPaging(from,size);
         BookingState bookingState;
         try {
             bookingState = BookingState.valueOf(state);
@@ -170,11 +168,5 @@ public class BookingService {
     private Item getItem(long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new EntityNotFoundException(String.format("Объект класса %s не найден", Item.class)));
-    }
-
-    private void checkArgumentsForPaging(Integer from, Integer size) {
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
-        }
     }
 }

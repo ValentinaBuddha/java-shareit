@@ -2,14 +2,12 @@ package ru.practicum.shareit.request;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.WrongNumbersForPagingException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -54,9 +52,6 @@ public class ItemRequestService {
 
     public List<ItemRequestDtoOut> getAllRequests(Integer from, Integer size, long userId) {
         log.info("Получение всех запросов постранично");
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
-        }
         getUser(userId);
         Pageable pageable = PageRequest.of(from / size, size, Sort.by("created").descending());
         List<ItemRequest> requests = requestRepository.findAllByRequestorIdIsNot(userId, pageable);

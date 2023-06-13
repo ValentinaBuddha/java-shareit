@@ -8,8 +8,11 @@ import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.utils.Create;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -38,8 +41,8 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoOut> getAllByBooker(@RequestParam(defaultValue = "1") Integer from,
-                                              @RequestParam(defaultValue = "10") Integer size,
+    public List<BookingDtoOut> getAllByBooker(@RequestParam(defaultValue = "1") @PositiveOrZero Integer from,
+                                              @RequestParam(defaultValue = "10") @Positive Integer size,
                                               @RequestParam(name = "state", defaultValue = "ALL") String state,
                                               @RequestHeader("X-Sharer-User-Id") long bookerId) {
         log.info("GET / ByBooker {}", bookerId);
@@ -47,8 +50,8 @@ public class BookingController {
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoOut> getAllByOwner(@RequestParam(defaultValue = "1") Integer from,
-                                             @RequestParam(defaultValue = "10") Integer size,
+    public List<BookingDtoOut> getAllByOwner(@RequestParam(defaultValue = "1") @PositiveOrZero Integer from,
+                                             @RequestParam(defaultValue = "10") @Positive Integer size,
                                              @RequestParam(name = "state", defaultValue = "ALL") String state,
                                              @RequestHeader("X-Sharer-User-Id") long ownerId) {
         log.info("GET / ByOwner / {}", ownerId);

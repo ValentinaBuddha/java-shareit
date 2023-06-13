@@ -11,8 +11,11 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 import ru.practicum.shareit.utils.Create;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -34,8 +37,8 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public List<ItemRequestDtoOut> getAllRequests(@RequestParam(defaultValue = "1") Integer from,
-                                                 @RequestParam(defaultValue = "10") Integer size,
+    public List<ItemRequestDtoOut> getAllRequests(@RequestParam(defaultValue = "1") @PositiveOrZero Integer from,
+                                                 @RequestParam(defaultValue = "10") @Positive Integer size,
                                                  @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("GET / requests");
         return requestService.getAllRequests(from, size, userId);

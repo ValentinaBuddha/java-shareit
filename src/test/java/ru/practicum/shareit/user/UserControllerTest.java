@@ -34,6 +34,7 @@ class UserControllerTest {
     private MockMvc mvc;
 
     private final UserDto userDto = new UserDto(1L, "User", "user@mail.ru");
+    private final UserDto userNoEmail = new UserDto(1L, "User", "");
 
     @Test
     void getAllUsers() throws Exception {
@@ -68,6 +69,16 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName()), String.class))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail()), String.class));
+    }
+
+    @Test
+    void saveNewUser_whenBlankEmail_thenThrownException() throws Exception {
+               mvc.perform(post("/users")
+                        .content(mapper.writeValueAsString(userNoEmail))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

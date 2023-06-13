@@ -13,7 +13,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotBookerException;
 import ru.practicum.shareit.exception.NotOwnerException;
-import ru.practicum.shareit.exception.WrongNumbersForPagingException;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDtoIn;
@@ -98,9 +97,6 @@ public class ItemService {
     @Transactional(readOnly = true)
     public List<ItemDtoOut> getItemsByOwner(Integer from, Integer size, long userId) {
         log.info("Получение вещи по владельцу {}", userId);
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
-        }
         getUser(userId);
         List<Item> items = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size));
         return addBookingsAndCommentsForList(items);
@@ -111,9 +107,6 @@ public class ItemService {
         log.info("Получение вещи по поиску {}", text);
         if (text.isBlank()) {
             return Collections.emptyList();
-        }
-        if (from < 0 || size == 0) {
-            throw new WrongNumbersForPagingException("Неверные параметры для пагинации.");
         }
         return itemRepository.search(text, PageRequest.of(from / size, size)).stream()
                 .map(ItemMapper::toItemDtoOut).collect(toList());

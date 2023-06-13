@@ -222,12 +222,6 @@ class BookingServiceTest {
     }
 
     @Test
-    void getAllByBooker_whenIncorrectArgumentsForPaging_thenExceptionThrown() {
-        Assertions.assertThrows(WrongNumbersForPagingException.class, () ->
-                bookingService.getAllByBooker(-1, 10, "ALL", 2L));
-    }
-
-    @Test
     void getAllByBooker_whenStateUnsupported_thenExceptionThrown() {
         Assertions.assertThrows(UnsupportedStatusException.class, () ->
                 bookingService.getAllByBooker(0, 10, "a", 2L));

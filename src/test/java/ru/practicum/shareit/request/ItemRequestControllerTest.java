@@ -84,6 +84,17 @@ class ItemRequestControllerTest {
     }
 
     @Test
+    void getAllRequests_whenBadPagingArguments_thenThrownException() throws Exception {
+        mvc.perform(get("/requests/all?from=0&size=-1")
+                        .content(mapper.writeValueAsString(requestDto))
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-Sharer-User-Id", 1L)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getRequestById() throws Exception {
         when(requestService.getRequestById(anyLong(), anyLong())).thenReturn(requestDto);
 
