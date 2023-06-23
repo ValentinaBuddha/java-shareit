@@ -9,7 +9,6 @@ services:
     depends_on:
       - server
     environment:
-      - TZ=Europe/Moscow
       - SHAREIT_SERVER_URL=http://server:9090
 
   server:
@@ -21,7 +20,6 @@ services:
     depends_on:
       - db
     environment:
-      - TZ=Europe/Moscow
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
 
   db:
