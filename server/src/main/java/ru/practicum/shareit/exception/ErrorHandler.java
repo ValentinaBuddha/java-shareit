@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ErrorHandler {
 
     @ExceptionHandler({MethodArgumentNotValidException.class, ItemIsNotAvailableException.class,
-            WrongDatesException.class, NotBookerException.class, UnsupportedStatusException.class})
+            NotBookerException.class, UnsupportedStatusException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse validateException(RuntimeException e) {
         log.info(e.getMessage());

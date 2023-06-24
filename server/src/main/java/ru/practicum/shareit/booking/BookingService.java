@@ -19,7 +19,6 @@ import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,10 +39,6 @@ public class BookingService {
         }
         if (userId == item.getOwner().getId()) {
             throw new NotAvailableToBookOwnItemsException("Функция бронировать собственную вещь отсутствует");
-        }
-        if (!bookingDtoIn.getEnd().isAfter(bookingDtoIn.getStart()) ||
-                bookingDtoIn.getStart().isBefore(LocalDateTime.now())) {
-            throw new WrongDatesException("Дата начала бронирования должна быть раньше даты возврата");
         }
         Booking booking = new Booking();
         booking.setItem(item);

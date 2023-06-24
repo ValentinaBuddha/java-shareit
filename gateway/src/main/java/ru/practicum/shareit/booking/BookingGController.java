@@ -8,10 +8,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoRequest;
 import ru.practicum.shareit.booking.dto.BookingState;
+import ru.practicum.shareit.exception.WrongDatesException;
 import ru.practicum.shareit.utils.Create;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
+import java.time.LocalDateTime;
 
 @Controller
 @RequestMapping(path = "/bookings")
@@ -25,6 +27,10 @@ public class BookingGController {
     public ResponseEntity<Object> saveNewBooking(@Validated(Create.class) @RequestBody BookingDtoRequest bookingDto,
                                                  @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("POST / bookings");
+        if (!bookingDto.getEnd().isAfter(bookingDto.getStart()) ||
+                bookingDto.getStart().isBefore(LocalDateTime.now())) {
+            throw new WrongDatesException("Дата начала бронирования должна быть раньше даты возврата");
+        }
         return bookingClient.saveNewBooking(bookingDto, userId);
     }
 

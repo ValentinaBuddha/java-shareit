@@ -49,9 +49,6 @@ class BookingServiceTest {
     private final BookingDtoIn bookingDtoIn = new BookingDtoIn(
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
             LocalDateTime.of(2023, 7, 30, 12, 12, 12), 1L);
-    private final BookingDtoIn bookingDtoInWrong = new BookingDtoIn(
-            LocalDateTime.of(2023, 7, 2, 12, 12, 12),
-            LocalDateTime.of(2023, 7, 1, 12, 12, 12), 1L);
     private final BookingDtoIn bookingDtoWrongItem = new BookingDtoIn(
             LocalDateTime.of(2023, 7, 1, 12, 12, 12),
             LocalDateTime.of(2023, 7, 30, 12, 12, 12), 2L);
@@ -104,15 +101,6 @@ class BookingServiceTest {
 
         Assertions.assertThrows(NotAvailableToBookOwnItemsException.class, () ->
                 bookingService.saveNewBooking(bookingDtoIn, 1L));
-    }
-
-    @Test
-    void saveNewBooking_whenIncorrectDatesOfBooking_thenThrownException() {
-        when(userRepository.findById(2L)).thenReturn(Optional.of(booker));
-        when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
-
-        Assertions.assertThrows(WrongDatesException.class, () ->
-                bookingService.saveNewBooking(bookingDtoInWrong, 2L));
     }
 
     @Test
