@@ -98,7 +98,8 @@ public class ItemService {
     public List<ItemDtoOut> getItemsByOwner(Integer from, Integer size, long userId) {
         log.info("Получение вещи по владельцу {}", userId);
         getUser(userId);
-        List<Item> items = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size));
+        List<Item> items = itemRepository.findAllByOwnerId(userId, PageRequest.of(from / size, size,
+                Sort.by("id").ascending()));
         return addBookingsAndCommentsForList(items);
     }
 
