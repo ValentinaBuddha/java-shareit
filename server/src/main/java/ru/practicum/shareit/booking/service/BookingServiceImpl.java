@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -26,11 +27,12 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class BookingService {
+public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
+    @Override
     public BookingDtoOut saveNewBooking(BookingDtoIn bookingDtoIn, long userId) {
         User booker = getUser(userId);
         Item item = getItem(bookingDtoIn.getItemId());
@@ -48,6 +50,7 @@ public class BookingService {
         return BookingMapper.toBookingDtoOut(booking);
     }
 
+    @Override
     public BookingDtoOut approve(long bookingId, Boolean isApproved, long userId) {
         Booking booking = getById(bookingId);
         if (booking.getStatus() != BookingStatus.WAITING) {
@@ -64,6 +67,7 @@ public class BookingService {
         return BookingMapper.toBookingDtoOut(booking);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public BookingDtoOut getBookingById(long bookingId, long userId) {
         log.info("Получение бронирования по идентификатору {}", bookingId);
@@ -76,6 +80,7 @@ public class BookingService {
         return BookingMapper.toBookingDtoOut(booking);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByBooker(Integer from, Integer size, String state, long bookerId) {
         BookingState bookingState;
@@ -112,6 +117,7 @@ public class BookingService {
         return bookings.stream().map(BookingMapper::toBookingDtoOut).collect(Collectors.toList());
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<BookingDtoOut> getAllByOwner(Integer from, Integer size, String state, long ownerId) {
         BookingState bookingState;

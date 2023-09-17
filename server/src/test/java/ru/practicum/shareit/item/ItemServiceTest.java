@@ -22,6 +22,7 @@ import ru.practicum.shareit.item.comment.dto.CommentMapper;
 import ru.practicum.shareit.item.dto.ItemDtoIn;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.dto.UserDtoShort;

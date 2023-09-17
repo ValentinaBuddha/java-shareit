@@ -2,11 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import ru.practicum.shareit.item.dto.CommentDtoRequest;
 import ru.practicum.shareit.item.dto.ItemDtoRequest;
 import ru.practicum.shareit.utils.Create;
@@ -14,7 +12,7 @@ import ru.practicum.shareit.utils.Update;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.util.ArrayList;
+import java.util.List;
 
 @Validated
 @Slf4j
@@ -61,7 +59,7 @@ public class ItemGController {
                                                   @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("GET / search / {}", text);
         if (text.isBlank()) {
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+            return ResponseEntity.ok(List.of());
         }
         return itemClient.getItemBySearch(from, size, text, userId);
     }

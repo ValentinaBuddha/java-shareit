@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
+import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/requests")
 public class ItemRequestController {
-    private final ItemRequestService requestService;
+    private final ItemRequestServiceImpl requestService;
 
     @PostMapping
     public ItemRequestDtoOut saveNewRequest(@RequestBody ItemRequestDtoIn requestDtoIn,

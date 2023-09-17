@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.item.comment.dto.CommentDtoOut;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDtoShort;
 
 import java.nio.charset.StandardCharsets;
@@ -36,12 +37,6 @@ class ItemControllerTest {
     private final ItemDtoOut itemDtoOut = new ItemDtoOut(
             1,
             "item",
-            "cool item",
-            true,
-            new UserDtoShort(1L, "User"));
-    private final ItemDtoOut itemBlankName = new ItemDtoOut(
-            1,
-            "",
             "cool item",
             true,
             new UserDtoShort(1L, "User"));

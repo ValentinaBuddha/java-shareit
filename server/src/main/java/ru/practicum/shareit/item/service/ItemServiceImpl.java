@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +13,8 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.exception.NotBookerException;
 import ru.practicum.shareit.exception.NotOwnerException;
+import ru.practicum.shareit.item.Item;
+import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.item.comment.dto.CommentDtoIn;
@@ -43,13 +45,14 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class ItemService {
+public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final ItemRequestRepository requestRepository;
 
+    @Override
     public ItemDtoOut saveNewItem(ItemDtoIn itemDtoIn, long userId) {
         log.info("Создание новой вещи {}", itemDtoIn.getName());
         User owner = getUser(userId);
@@ -63,6 +66,7 @@ public class ItemService {
         return ItemMapper.toItemDtoOut(itemRepository.save(item));
     }
 
+    @Override
     public ItemDtoOut updateItem(long itemId, ItemDtoIn itemDtoIn, long userId) {
         log.info("Обновление вещи {} с идентификатором {}", itemDtoIn.getName(), itemId);
         getUser(userId);
@@ -87,6 +91,7 @@ public class ItemService {
         return ItemMapper.toItemDtoOut(item);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public ItemDtoOut getItemById(long itemId, long userId) {
         log.info("Получение вещи по идентификатору {}", itemId);
@@ -94,6 +99,7 @@ public class ItemService {
         return addBookingsAndComments(item, userId);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<ItemDtoOut> getItemsByOwner(Integer from, Integer size, long userId) {
         log.info("Получение вещи по владельцу {}", userId);
@@ -103,6 +109,7 @@ public class ItemService {
         return addBookingsAndCommentsForList(items);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public List<ItemDtoOut> getItemBySearch(Integer from, Integer size, String text) {
         log.info("Получение вещи по поиску {}", text);
@@ -113,6 +120,7 @@ public class ItemService {
                 .map(ItemMapper::toItemDtoOut).collect(toList());
     }
 
+    @Override
     public CommentDtoOut saveNewComment(long itemId, CommentDtoIn commentDtoIn, long userId) {
         if (!bookingRepository.existsByBookerIdAndItemIdAndEndBefore(userId, itemId, LocalDateTime.now())) {
             throw new NotBookerException("Пользователь не пользовался вещью");
