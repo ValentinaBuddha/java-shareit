@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.dto.ItemDtoShort;
 import ru.practicum.shareit.user.dto.UserDtoShort;
 
@@ -37,10 +38,6 @@ class BookingControllerTest {
 
     private final BookingDtoIn bookingDto = new BookingDtoIn(
             LocalDateTime.now().plusDays(1),
-            LocalDateTime.now().plusDays(2),
-            1L);
-    private final BookingDtoIn bookingNullStart = new BookingDtoIn(
-            null,
             LocalDateTime.now().plusDays(2),
             1L);
     private final BookingDtoOut bookingDtoOut = new BookingDtoOut(

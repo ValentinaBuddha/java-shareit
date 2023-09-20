@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
+import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -34,14 +35,12 @@ class ItemRequestServiceTest {
     @Mock
     private ItemRepository itemRepository;
     @InjectMocks
-    private ItemRequestService requestService;
+    private ItemRequestServiceImpl requestService;
 
     private final User requestor = new User(2L, "user2", "user2@mail.ru");
     private final User user = new User(1L, "User", "user@mail.ru");
     private final ItemRequest request = new ItemRequest(1L, "description", requestor, LocalDateTime.now());
-    private final ItemRequest requestSecond = new ItemRequest(2L, "2", user, LocalDateTime.now());
     private final Item item = new Item(1L, "item", "cool", true, user, request);
-    private final Item itemSecond = new Item(2L, "i2", "2", true, requestor, requestSecond);
 
     @Test
     void saveNewRequest() {

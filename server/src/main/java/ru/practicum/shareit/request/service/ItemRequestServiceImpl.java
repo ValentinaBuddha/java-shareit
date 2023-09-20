@@ -1,4 +1,4 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +11,8 @@ import ru.practicum.shareit.exception.EntityNotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDtoOut;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestRepository;
 import ru.practicum.shareit.request.dto.ItemRequestDtoIn;
 import ru.practicum.shareit.request.dto.ItemRequestDtoOut;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
@@ -28,11 +30,12 @@ import static org.springframework.data.domain.Sort.Direction.DESC;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ItemRequestService {
+public class ItemRequestServiceImpl implements ItemRequestService {
     private final ItemRequestRepository requestRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
+    @Override
     @Transactional
     public ItemRequestDtoOut saveNewRequest(ItemRequestDtoIn requestDtoIn, long userId) {
         log.info("Создание нового запроса {}", requestDtoIn.getDescription());
@@ -43,6 +46,7 @@ public class ItemRequestService {
         return ItemRequestMapper.toItemRequestDtoOut(requestRepository.save(request));
     }
 
+    @Override
     public List<ItemRequestDtoOut> getRequestsByRequestor(long userId) {
         log.info("Получение всех запросов по просителю с идентификатором {}", userId);
         getUser(userId);
@@ -50,6 +54,7 @@ public class ItemRequestService {
         return addItems(requests);
     }
 
+    @Override
     public List<ItemRequestDtoOut> getAllRequests(Integer from, Integer size, long userId) {
         log.info("Получение всех запросов постранично");
         getUser(userId);
@@ -58,6 +63,7 @@ public class ItemRequestService {
         return addItems(requests);
     }
 
+    @Override
     public ItemRequestDtoOut getRequestById(long requestId, long userId) {
         log.info("Получение запроса по идентификатору {}", requestId);
         getUser(userId);
