@@ -11,7 +11,17 @@
 4. Реализация микросервисной архитектуры. Добавление модуля  gateway - сюда перенесена вся логика валидации входных данных кроме той, которая требует работы с БД.
 Стек: микросервисы, Docker
 
-## Схема базы данных
+[Тесты Postman](https://github.com/yandex-praktikum/java-shareit/blob/add-docker/postman/sprint.json)
+
+### Иструкция по развертыванию
+* mvn clean package
+* mvn install
+* docker-compose build
+* docker-compose up -d
+* gateway: http://localhost:8080
+* основной сервис: http://localhost:9090
+
+### Схема базы данных
 
 ![Схема](shareit.png)
 
